@@ -1,0 +1,12 @@
+{
+  "name": "microswipe",
+  "private": true,
+  "type": "module",
+  "description": "Application mobile d'entraînement par cartes à balayer, jouable hors ligne.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

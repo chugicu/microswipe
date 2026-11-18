@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(git commit *--no-verify*)",
+      "Bash(git commit -n*)",
+      "Bash(git commit * -n*)",
+      "Bash(git push *--force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * -f*)",
+      "Bash(git config *core.hooksPath*)"
+    ],
+    "ask": [
+      "Bash(git push *main*)",
+      "Bash(git merge*)",
+      "Bash(git checkout *main*)",
+      "Bash(git switch *main*)",
+      "Bash(git reset --hard*)",
+      "Bash(git branch -D*)"
+    ]
+  }
+}

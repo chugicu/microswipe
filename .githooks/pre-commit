@@ -1,0 +1,40 @@
+#!/bin/sh
+# Refuse un commit sur main ou un commit qui contient un fichier interdit (contenu réel, tableur, secret).
+
+est_interdit() {
+  case "$1" in
+    contenu-local/*) return 0 ;;
+  esac
+  case "${1##*/}" in
+    *.xlsx | *.xlsm | *.xls | *.ods | *.csv | *.tsv) return 0 ;;
+    Code.gs | Defaults.gs | .clasprc.json | .env | .env.*) return 0 ;;
+  esac
+  return 1
+}
+
+branche=$(git symbolic-ref --short -q HEAD)
+if [ "$branche" = "main" ]; then
+  echo "Commit refusé : la branche main ne reçoit que le premier commit. Travaille sur dev." >&2
+  exit 1
+fi
+
+refuse=0
+fichiers=$(git diff --cached --name-only --diff-filter=ACMR)
+while IFS= read -r chemin; do
+  [ -z "$chemin" ] && continue
+  if est_interdit "$chemin"; then
+    if [ "$refuse" = 0 ]; then
+      echo "Commit refusé : ces fichiers ne doivent jamais être enregistrés (contenu réel, tableur, code de Carnet Réa ou secret) :" >&2
+      refuse=1
+    fi
+    echo "  - $chemin" >&2
+  fi
+done <<LISTE
+$fichiers
+LISTE
+
+if [ "$refuse" = 1 ]; then
+  echo "Retire-les du commit avec : git restore --staged <fichier>" >&2
+  exit 1
+fi
+exit 0
