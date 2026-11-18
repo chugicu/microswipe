@@ -1,0 +1,30 @@
+# Liste les fichiers que git ne doit jamais enregistrer (contenu réel, tableurs, secrets, réglages locaux).
+
+# Contenu réel de travail
+contenu-local/
+
+# Tableurs et exports
+*.xlsx
+*.xlsm
+*.xls
+*.ods
+*.csv
+*.tsv
+
+# Code serveur de Carnet Réa
+Code.gs
+Defaults.gs
+
+# Identifiants et secrets
+.clasprc.json
+.env
+.env.*
+*.pem
+
+# Réglages locaux de Claude Code
+.claude/settings.local.json
+
+# Outils
+node_modules/
+.DS_Store
+Thumbs.db

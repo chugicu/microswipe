@@ -1,0 +1,2 @@
+# Force la fin de ligne LF pour tous les fichiers texte, afin que le crochet en shell marche partout.
+* text=auto eol=lf
