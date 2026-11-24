@@ -5,7 +5,7 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 ## État
 
 - Dernier lot fait : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
-- Prochain lot : **301** (ne dépend que du 101) ; le lot 107 dépend de 102, 103 et 104 (tous trois faits).
+- Prochain lot : 107
 
 ## Environnement
 
