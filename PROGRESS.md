@@ -4,7 +4,7 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 ## État
 
-- Dernier lot fait : **105** (design system 1), le 24 novembre 2026 : code, tests Node (148), contrôles 16 à 22 et critères 2, 4, 5, 6 vérifiés ; **critère 3 (avis de l'auteur sur l'aspect) en attente**, voir « Points à vérifier ». Avant lui : **107** (chargement du contenu), le 24 novembre 2026 : code, tests Node et critère 6 vérifiés ; mouvement réduit soldé au lot 105. Avant lui : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
+- Dernier lot fait : **105** (design system 1), le 24 novembre 2026 : code, tests Node (148), contrôles 16 à 22 et critères 2 à 6 vérifiés ; **critère 3 validé par l'auteur** (aspect du catalogue à 390 et 800 px, dialogue sur paillasse claire compris). Avant lui : **107** (chargement du contenu), le 24 novembre 2026 : code, tests Node et critère 6 vérifiés ; mouvement réduit soldé au lot 105. Avant lui : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
 - Prochain lot : 108 (le lot 106 attend sa spec)
 
 ## Environnement
@@ -245,7 +245,7 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
   - critère 4 : cache `microbio-coquille-v5` de 48 fichiers, dont les 9 fichiers de `client/polices/` et 11 de `client/design/` ;
   - critère 5 : seconde connexion à `microbio` en version 99 → le dialogue s'affiche avec les mêmes textes, le focus est dans le dialogue ; Échap le ferme et il ne revient pas ; à l'appui (état forcé), le bouton descend de 4 px et la tranche passe de 5 à 1 px, sans saut d'ombre (ombre fixe). Le bouton « Recharger » n'a pas été cliqué (rechargement de page non exercé) ;
   - **critère 6, soldé** : en émulation `prefers-reduced-motion: reduce`, le dialogue apparaît et disparaît en fondu de 0,12 s (`linear`), sans échelle, retiré 123 ms après la fermeture (contre 0,24 s et 249 ms sans réduction) ; transition des boutons 0 s. **La réserve du lot 107 est donc soldée** (vérifiée dans Chrome, pas sur iPhone).
-  - **Critère 3 en attente** : captures du catalogue à 390 et 800 px montrées à l'auteur, avis non reçu. Rendu des filtres de bruit : fluide dans Chrome de l'ordinateur ; coût sur iPhone à mesurer au lot 108.
+  - **Critère 3 validé par l'auteur le 24 novembre 2026** : captures du catalogue à 390 et 800 px, puis du dialogue sur paillasse claire. Rendu des filtres de bruit : fluide dans Chrome de l'ordinateur ; coût sur iPhone à mesurer au lot 108.
 - Licence du dépôt : non choisie (point signalé de l'index).
 
 ## Idées notées
@@ -256,7 +256,7 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 - Lot 103 : terminé et publié (Pages activé, `main` avancée le 23 novembre jusqu'à 57d26d6, critères 1 à 9 vérifiés). Les notes de PROGRESS.md postérieures sont sur `dev`.
 - Lot 104 : publication (avance de `main`) seulement avec l'accord de l'auteur.
-- Lot 105 : fait, sauf l'avis de l'auteur sur l'aspect (critère 3) ; commit local, push après son avis. Corriger dans le design system les trois écarts de la décision 10 de la spec (§ 4.2, § 7.1, § 3.4) : à la source.
+- Lot 105 : fait et poussé sur `dev` (critère 3 validé). Corriger dans le design system les trois écarts de la décision 10 de la spec (§ 4.2, § 7.1, § 3.4) : à la source.
 - Lot 107 : fait ; mouvement réduit du dialogue soldé au lot 105 ; **à reporter dans `claude/depot/specs/lot-107.md`** si la spec y a encore l'ancienne version (voir Décisions du lot 104). Publication (avance de `main`) seulement avec l'accord de l'auteur.
 - Lot 106 (spec à écrire), 108.
 - `main` n'avance qu'avec l'accord de l'auteur.
