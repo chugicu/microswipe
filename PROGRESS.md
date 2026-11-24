@@ -4,8 +4,8 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 ## État
 
-- Dernier lot fait : **107** (chargement du contenu), le 24 novembre 2026 : code, tests Node et critère 6 (navigateur intégré, 390 px) vérifiés, voir « Points à vérifier » ; mouvement réduit à revoir au lot 106. Avant lui : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
-- Prochain lot : 108 (les lots 105 et 106 attendent leurs specs)
+- Dernier lot fait : **105** (design system 1), le 24 novembre 2026 : code, tests Node (148), contrôles 16 à 22 et critères 2, 4, 5, 6 vérifiés ; **critère 3 (avis de l'auteur sur l'aspect) en attente**, voir « Points à vérifier ». Avant lui : **107** (chargement du contenu), le 24 novembre 2026 : code, tests Node et critère 6 vérifiés ; mouvement réduit soldé au lot 105. Avant lui : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
+- Prochain lot : 108 (le lot 106 attend sa spec)
 
 ## Environnement
 
@@ -159,6 +159,42 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - Migration 2 (lot 107) : magasin `contenu`, clé `type`. `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passés de 3 à 4.
 - **Tests** : `tests/client/contenu/regles.test.js` (1 à 5), `chargeur.test.js` (6 à 19 et 24), `rechargement.test.js` (23). Page de vérification : `tests/navigateur/contenu.html` et `contenu.js` (20 à 22 et 25), à servir comme celle du lot 104 puis « Lancer ».
 
+### Lot 105
+
+**Règles pour tous les lots suivants**
+
+- **Toute valeur visuelle se lit dans `client/design/jetons.css` ; une valeur absente se demande, puis s'ajoute là et dans le tableau du `lot-105.md` § 6.1** (le test 1 compare les deux).
+- **Tout dialogue passe par `ouvrirDialogue`.**
+- **Un composant commun se range dans `client/design/` et s'ajoute au catalogue `tests/navigateur/design.html`.**
+- Aucune couleur en dur hors de `jetons.css` (et `milieux.js` pour le JavaScript) ; aucun `:root` ailleurs ; aucune taille de texte en `px` ; seules `transform` et `opacity` s'animent (tests 2 à 4).
+- Un bouton en relief appelle `.bouton-principal`, `.bouton-boss` ou `.bouton-tous-les-mondes` ; son icône est un `<svg>` enfant, dont la taille se règle sur place (20 px dans principal et boss ; fixée au lot 202 pour « tous les mondes »).
+
+**Ce que les lots suivants reçoivent**
+
+| Lot | Usage |
+|---|---|
+| Tous | Voir les règles ci-dessus. |
+| 106 | Montée (`--duree-longue`, `--courbe-sortie`), fermeture et glissement de la fiche, branchés sur `ouvrirFiche` / `fermer` ; ressorts ; changements d'écran ; règle générale du mouvement réduit ; plans `--plan-*`. Le mouvement réduit du dialogue est déjà fait. Retour des boutons plats : le lot 106 peut remplacer la compression par un ressort. |
+| 202 | `milieuDe`, `poserMilieu`, `.gelose`, `--paillasse`, `creerScotch`, `creerRangeeDEtoiles`, `ORDRE_DE_REMPLISSAGE`, `.bouton-tous-les-mondes` (et son icône), `--or-1` à `--or-3`, `--contamination-1` et `-2`. Les objets de paillasse et la pastille d'état sont à lui. |
+| 203 | `ouvrirFiche`, `.paillasse-claire`, `.paillasse-sombre` (et son grain), `creerTrio` (`fiche`), `creerScotch`, `.bouton-principal`, `.bouton-boss`, `.lien-action`, `.bouton-icone`. Le médaillon et le tampon sont à lui. Focus sur la paillasse sombre : point signalé 79. |
+| 207 | `creerTrio` (`fin`), `ORDRE_DE_REMPLISSAGE`, `creerScotch`, `.bouton-principal`, `.bouton-secondaire`. |
+| 403, 505, 506, 315 | `ouvrirDialogue` pour leurs confirmations ; `irreversible: true` pour « Archiver » (§ 12.5) et toute action qui ne se défait pas. |
+
+**Fichiers et signatures**
+
+- `client/design/jetons.css` (le seul `:root`), `polices.css`, `composants.css` (boutons, matières, fiche, dialogue, scotch, étoiles, `.chiffres`).
+- `client/design/milieux.js` : `MILIEUX` (sang, bcp, chocolat, neutre), `CLE_MILIEU_DE_SECOURS`, `milieuDe(cle)`, `poserMilieu(element, cle)`.
+- `client/design/matieres.js` : `FILTRES_DE_MATIERE`, `balisageDesMatieres()`, `installerMatieres()` (en tête de `DEMARRAGES_BRANCHES`).
+- `client/design/regles-dialogue.js` : `preparerDialogue(options)` (pure, erreur `dialogue_mal_forme`). `client/design/dialogue.js` : `ouvrirDialogue(options)` → `{ element, fermer() }` (`element` = le voile, `null` tant que le dialogue attend son tour).
+- `client/design/fiche.js` : `ouvrirFiche({ libelle, contenu, sombre, surFermeture })` → `{ element, corps, fermer() }` (erreur `fiche_mal_formee` sans `libelle`).
+- `client/design/piege-focus.js` (ajout, non listé au § 5) : `memoriserLeFocus()`, `pieger(conteneur, evenement)`, communs au dialogue et à la fiche.
+- `client/design/scotch.js` : `ANGLE_DU_SCOTCH_MIN`, `ANGLE_DU_SCOTCH_MAX`, `angleDuScotch(angle)`, `creerScotch({ texte, revision, angle, lu })` → un `<span class="scotch-enveloppe">` qui contient le `<span class="scotch">` (l'ombre est un `drop-shadow` de l'enveloppe).
+- `client/design/etoiles.js` : `ORDRE_DE_REMPLISSAGE`, `etatsDuTrio(nombre)`, `creerEtoile({ pleine, taille, sombre })`, `creerTrio({ nombre, pourcentages, variante, libelle })` (`libelle` = `aria-label`), `creerRangeeDEtoiles({ nombre })`.
+- **Polices** (`client/polices/`, téléchargées une fois le 24 novembre 2026, avec l'accord de l'auteur, depuis `fonts.googleapis.com/css2?family=Inter:wght@400..800&family=Bricolage+Grotesque:opsz,wght@12..96,600..700&family=Caveat:wght@600..700&display=swap`) : fichiers variables, latin et latin-ext, sur `fonts.gstatic.com` : `inter-latin.woff2` (48 432 o, `/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2`), `inter-latin-ext.woff2` (85 272 o, `…SjIa25L7W0Q5n-wU.woff2`), `bricolage-grotesque-latin.woff2` (76 868 o, `/s/bricolagegrotesque/v9/3y9K6as8bTXq_nANBjzKo3IeZx8z6up5BeSl9D4dj_x9PpZBMlGIInHWVyNJ.woff2`), `bricolage-grotesque-latin-ext.woff2` (30 636 o, `…PpZBMlGGInHWVyNJtvI.woff2`), `caveat-latin.woff2` (74 572 o, `/s/caveat/v23/Wnz6HAc5bAfYB2Q7ZjYYiAzcPA.woff2`), `caveat-latin-ext.woff2` (29 528 o, `…Q7aDYYiAzcPDKo.woff2`). Licences : `OFL-inter.txt` (4 377 o), `OFL-bricolage-grotesque.txt` (4 403 o), `OFL-caveat.txt` (4 385 o), depuis `raw.githubusercontent.com/google/fonts/main/ofl/{inter,bricolagegrotesque,caveat}/OFL.txt`.
+- `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passés de 4 à 5 ; les 21 nouveaux fichiers de `client/` sont dans `FICHIERS_DE_LA_COQUILLE`.
+- Rebranchement du lot 107 : `client/contenu/dialogue-rechargement.js` appelle `ouvrirDialogue` (signature inchangée) ; `coquille.css` ne garde que la page, la colonne et l'accueil.
+- **Tests** : `tests/client/design/jetons.test.js` (1 à 6), `polices.test.js` (7 à 9), `composants.test.js` (10 à 15), aide `aides-css.js`. Catalogue et contrôles 16 à 22 : `tests/navigateur/design.html` (+ `design.js`, `design.css`), à servir comme celui du lot 107, puis « Lancer ».
+
 ## Décisions
 
 - 23 novembre 2026 (lot 103, après essai sur téléphone) : la coquille se zoomait et se déplaçait dans tous les sens ; sur le choix de l'auteur, zoom par pincement, déplacement horizontal et rebond de la page sont bloqués (`maximum-scale=1, user-scalable=no`, `touch-action: pan-y`, `overscroll-behavior: none`, `gesturestart` annulé pour l'iPhone). Le défilement vertical reste. Contrepartie : plus d'agrandissement du texte par pincement. `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passent à 2. Publié le 23 novembre ; installé sur le téléphone de l'auteur : icône correcte. Vérifié par l'auteur sur Safari (iPhone) avec la version 2 : ni zoom ni déplacement. Critère 7 : icône et affichage vus ; mode avion, installation sous Android et critères 3 et 4 (navigateur de bureau) restent à vérifier.
@@ -182,6 +218,11 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - 24 novembre 2026 (lot 107) : le dialogue est au plan 60 (design system § 5.4) ; l'accueil n'a pas de `z-index` : un dialogue qui s'afficherait pendant la seconde de l'accueil passerait au-dessus (cas quasi impossible, non traité).
 - 24 novembre 2026 (lot 107) : hauteurs des boutons du dialogue, 60 px (principal) et 50 px (secondaire) : conformes au § 9.1 du design system, gardées telles quelles, même côte à côte au-delà de 600 px (constat de l'auteur).
 
+- 24 novembre 2026 (lot 105) : **bouton en relief, ombre fixe** (choix de l'auteur). Avec `transform` et `opacity` seuls, il faut trois calques (face, tranche fixe, ombre qui s'efface) et un `<button>` n'a que deux pseudo-éléments sans balisage de plus. Réalisation : le bouton descend de 4 px ; `::before` = face (dégradé, reflet), `::after` = tranche et ombre, qui restent en place (la tranche remonte de 4 px, il en reste 1 px). **L'ombre ne change pas à l'appui** : `--ombre-relief-appui` et `--ombre-relief-boss-appui` sont dans `jetons.css` (test 1) mais inutilisées. Mesuré : tranche `translateY(5px)` au repos, `1px` à l'appui.
+- 24 novembre 2026 (lot 105) : **test 10 du lot 101 modifié, avec l'accord de l'auteur** : `docs/specs/index.md` (copie octet pour octet) cite « claude/depot » (lignes 14, 356, 359) ; il rejoint `lot-101.md` dans les exceptions du test (`tests/outillage/documents.test.js`, une ligne).
+- 24 novembre 2026 (lot 105) : précisions prises là où la spec se taisait. Matière claire : lumière et ombre sont des couches de fond de l'élément, donc sous la marbrure et le grain (la spec les met au-dessus) : écart de rendu minime, noté pour le catalogue. `creerScotch` rend l'enveloppe, pas le scotch. `ouvrirDialogue` rend un `element` nul tant que le dialogue attend. Dialogue : Échap et Tab sont pris en phase de capture sur `window` et arrêtés, pour qu'une fiche ouverte dessous ne reprenne pas le focus. Fiche : `libelle` absent → erreur `fiche_mal_formee`. Trio : le pourcentage du milieu est relevé avec son étoile. Rangée sombre : marge 2 px 4 px posée en padding. Les jetons du dialogue passent aux polices du design system (titre en Bricolage) : seul changement visible du dialogue de rechargement avec la police.
+- 24 novembre 2026 (lot 105) : le lot 107 a été codé avant ; son `afficherDialogueDeRechargement` rend maintenant le retour d'`ouvrirDialogue` (`{ element, fermer }`) au lieu du voile.
+
 - Rien n'est poussé : le commit du lot 102 est sur `dev`, local ; le push attend l'accord de l'auteur.
 
 ## Points à vérifier
@@ -198,6 +239,12 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
   - 6.4 : **réussi pour le lot 107, avec une réserve** : seules erreurs de la console, l'inscription du service worker, que le navigateur intégré ne gère pas (`sw.js` bien servi ; déjà noté au lot 103). Aucun indicateur de chargement.
   - Mouvement réduit (fin du 6.7) : **vérifié seulement par lecture de la feuille de style chargée** (en mouvement réduit, fondu de 120 ms sans `transform`, plus de transition des boutons) : l'outil ne sait pas émuler le réglage. **À vérifier en vrai au lot 106** (émulation de Chrome, ou téléphone).
   - Captures du dialogue faites à 390 px (boutons empilés) et à 800 px (côte à côte, « Recharger » à droite).
+- **Lot 105, vérifications du 24 novembre 2026** (appli servie par un petit serveur Python sans cache, hors dépôt ; navigateur intégré pour le catalogue, **Chrome 158 piloté par CDP dans un profil jetable** pour le reste, le navigateur intégré ne gérant ni service worker ni émulation du mouvement réduit) :
+  - critère 2 : contrôles 16 à 22 « 7 contrôles réussis sur 7 » à 390 et à 800 px ; aucune erreur dans la console ; Inter, Bricolage Grotesque et Caveat chargées ; avec le service worker actif et le réseau coupé, les trois polices sont servies par le cache (200) ;
+  - critère 4 : cache `microbio-coquille-v5` de 48 fichiers, dont les 9 fichiers de `client/polices/` et 11 de `client/design/` ;
+  - critère 5 : seconde connexion à `microbio` en version 99 → le dialogue s'affiche avec les mêmes textes, le focus est dans le dialogue ; Échap le ferme et il ne revient pas ; à l'appui (état forcé), le bouton descend de 4 px et la tranche passe de 5 à 1 px, sans saut d'ombre (ombre fixe). Le bouton « Recharger » n'a pas été cliqué (rechargement de page non exercé) ;
+  - **critère 6, soldé** : en émulation `prefers-reduced-motion: reduce`, le dialogue apparaît et disparaît en fondu de 0,12 s (`linear`), sans échelle, retiré 123 ms après la fermeture (contre 0,24 s et 249 ms sans réduction) ; transition des boutons 0 s. **La réserve du lot 107 est donc soldée** (vérifiée dans Chrome, pas sur iPhone).
+  - **Critère 3 en attente** : captures du catalogue à 390 et 800 px montrées à l'auteur, avis non reçu. Rendu des filtres de bruit : fluide dans Chrome de l'ordinateur ; coût sur iPhone à mesurer au lot 108.
 - Licence du dépôt : non choisie (point signalé de l'index).
 
 ## Idées notées
@@ -208,6 +255,7 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 - Lot 103 : terminé et publié (Pages activé, `main` avancée le 23 novembre jusqu'à 57d26d6, critères 1 à 9 vérifiés). Les notes de PROGRESS.md postérieures sont sur `dev`.
 - Lot 104 : publication (avance de `main`) seulement avec l'accord de l'auteur.
-- Lot 107 : fait ; mouvement réduit du dialogue à vérifier en vrai au lot 106 ; **à reporter dans `claude/depot/specs/lot-107.md`** si la spec y a encore l'ancienne version (voir Décisions du lot 104). Publication (avance de `main`) seulement avec l'accord de l'auteur.
-- Lots 105 et 106 (specs à écrire), 108.
+- Lot 105 : fait, sauf l'avis de l'auteur sur l'aspect (critère 3) ; commit local, push après son avis. Corriger dans le design system les trois écarts de la décision 10 de la spec (§ 4.2, § 7.1, § 3.4) : à la source.
+- Lot 107 : fait ; mouvement réduit du dialogue soldé au lot 105 ; **à reporter dans `claude/depot/specs/lot-107.md`** si la spec y a encore l'ancienne version (voir Décisions du lot 104). Publication (avance de `main`) seulement avec l'accord de l'auteur.
+- Lot 106 (spec à écrire), 108.
 - `main` n'avance qu'avec l'accord de l'auteur.

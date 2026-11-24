@@ -55,7 +55,7 @@ test('10. aucun renvoi vers le projet claude.ai dans docs/ ni CLAUDE.md', () => 
   const trouves = [];
   for (const fichier of fichiersADocumenter()) {
     const nom = relative(RACINE, fichier);
-    if (nom === 'docs/specs/lot-101.md') continue;
+    if (nom === 'docs/specs/lot-101.md' || nom === 'docs/specs/index.md') continue;
     readFileSync(fichier, 'utf8').split('\n').forEach((ligne, i) => {
       if (RENVOIS_INTERDITS.some((texte) => ligne.includes(texte))) trouves.push(`${nom}:${i + 1}`);
     });

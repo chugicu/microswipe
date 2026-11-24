@@ -3,7 +3,7 @@
 importScripts('client/coquille/sw/regles-sw.js');
 
 // Même valeur que VERSION_CLIENT (client/version.js), sur une seule ligne : un test les compare.
-const VERSION_DE_LA_COQUILLE = 4;
+const VERSION_DE_LA_COQUILLE = 5;
 
 const NOM_DU_CACHE = nomDuCache(VERSION_DE_LA_COQUILLE);
 

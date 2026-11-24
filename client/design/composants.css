@@ -1,0 +1,483 @@
+/* Composants communs : boutons, matières, fiche, dialogue, scotch, étoiles (spec du lot 105 § 6.3 à § 6.10). Aucune couleur ni taille de texte en dur : seulement des var(--…) de jetons.css. Seules transform et opacity s'animent. */
+
+body {
+  font-family: var(--police-texte);
+}
+
+.chiffres {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Boutons (§ 6.5) ---------- */
+
+.bouton-principal,
+.bouton-boss,
+.bouton-tous-les-mondes,
+.bouton-secondaire,
+.lien-action,
+.bouton-icone,
+.bouton-danger {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 var(--esp-4);
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bouton-principal:focus-visible,
+.bouton-boss:focus-visible,
+.bouton-tous-les-mondes:focus-visible,
+.bouton-secondaire:focus-visible,
+.lien-action:focus-visible,
+.bouton-icone:focus-visible,
+.bouton-danger:focus-visible {
+  outline: var(--anneau-focus) solid var(--bleu);
+  outline-offset: var(--decalage-focus);
+}
+
+.bouton-principal:disabled,
+.bouton-boss:disabled,
+.bouton-tous-les-mondes:disabled,
+.bouton-secondaire:disabled,
+.lien-action:disabled,
+.bouton-icone:disabled,
+.bouton-danger:disabled,
+[aria-disabled="true"].bouton-principal,
+[aria-disabled="true"].bouton-boss,
+[aria-disabled="true"].bouton-tous-les-mondes,
+[aria-disabled="true"].bouton-secondaire,
+[aria-disabled="true"].lien-action,
+[aria-disabled="true"].bouton-icone,
+[aria-disabled="true"].bouton-danger {
+  opacity: var(--opacite-desactive);
+}
+
+/* Relief : le bouton se déplace ; ::before est la face (dégradé et reflet), ::after la tranche et l'ombre, qui restent en place (décision de l'auteur : l'ombre ne change pas à l'appui, faute d'un troisième calque). */
+.bouton-principal,
+.bouton-boss,
+.bouton-tous-les-mondes {
+  --relief-haut: var(--encre-haut);
+  --relief-bas: var(--encre);
+  --relief-tranche: var(--encre-ombre);
+  --relief-ombre: var(--ombre-relief);
+  --relief-reflet: inset 0 1px 0 var(--reflet-relief);
+  position: relative;
+  isolation: isolate;
+  height: 60px;
+  border: 0;
+  border-radius: var(--rayon-relief);
+  background: transparent;
+  color: var(--creme);
+  font: var(--texte-bouton);
+  gap: 10px;
+  transition: transform var(--duree-contact) var(--courbe-standard);
+}
+
+.bouton-principal::before,
+.bouton-boss::before,
+.bouton-tous-les-mondes::before,
+.bouton-principal::after,
+.bouton-boss::after,
+.bouton-tous-les-mondes::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.bouton-principal::before,
+.bouton-boss::before,
+.bouton-tous-les-mondes::before {
+  z-index: -1;
+  background: linear-gradient(var(--relief-haut), var(--relief-bas));
+  box-shadow: var(--relief-reflet);
+}
+
+.bouton-principal::after,
+.bouton-boss::after,
+.bouton-tous-les-mondes::after {
+  z-index: -2;
+  background: var(--relief-tranche);
+  box-shadow: var(--relief-ombre);
+  transform: translateY(var(--tranche-relief));
+  transition: transform var(--duree-contact) var(--courbe-standard);
+}
+
+.bouton-principal:not(:disabled):not([aria-disabled="true"]):active,
+.bouton-boss:not(:disabled):not([aria-disabled="true"]):active,
+.bouton-tous-les-mondes:not(:disabled):not([aria-disabled="true"]):active {
+  transform: translateY(var(--descente-relief));
+}
+
+/* La tranche reste en place : elle remonte autant que le bouton descend, et n'en laisse qu'1 px. */
+.bouton-principal:not(:disabled):not([aria-disabled="true"]):active::after,
+.bouton-boss:not(:disabled):not([aria-disabled="true"]):active::after,
+.bouton-tous-les-mondes:not(:disabled):not([aria-disabled="true"]):active::after {
+  transform: translateY(calc(var(--tranche-relief) - var(--descente-relief)));
+}
+
+.bouton-boss {
+  --relief-haut: var(--orange-boss-haut);
+  --relief-bas: var(--orange-boss-bas);
+  --relief-tranche: var(--orange-boss-tranche);
+  --relief-ombre: var(--ombre-relief-boss);
+  --relief-reflet: none;
+  color: var(--texte-sur-orange);
+}
+
+.bouton-tous-les-mondes {
+  height: 54px;
+  font: var(--texte-bouton-tous-les-mondes);
+}
+
+.bouton-principal svg,
+.bouton-boss svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* Boutons plats : compression à l'appui. */
+.bouton-secondaire {
+  height: 50px;
+  border: 1.5px solid var(--bordure-secondaire);
+  border-radius: var(--rayon-3);
+  background: var(--surface-secondaire);
+  color: var(--texte);
+  font: var(--texte-bouton-2);
+  gap: 8px;
+}
+
+.lien-action {
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--texte-lien-action);
+  font: var(--texte-lien);
+  gap: 8px;
+}
+
+.bouton-icone {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--rayon-pastille);
+  background: var(--bouton-icone-gelose);
+}
+
+.bouton-icone.sur-encre {
+  background: var(--bouton-icone-encre);
+}
+
+.bouton-danger {
+  height: 48px;
+  border: 1.5px solid var(--faux);
+  border-radius: var(--rayon-3);
+  background: var(--surface);
+  color: var(--faux);
+  font: var(--texte-lien);
+}
+
+.bouton-secondaire,
+.lien-action,
+.bouton-icone,
+.bouton-danger {
+  transition: transform var(--duree-contact) var(--courbe-standard);
+}
+
+.bouton-secondaire:not(:disabled):not([aria-disabled="true"]):active,
+.lien-action:not(:disabled):not([aria-disabled="true"]):active,
+.bouton-icone:not(:disabled):not([aria-disabled="true"]):active,
+.bouton-danger:not(:disabled):not([aria-disabled="true"]):active {
+  transform: scale(var(--echelle-appui));
+}
+
+.bouton-secondaire svg,
+.lien-action svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.bouton-icone svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Matières (§ 6.3) ---------- */
+
+.paillasse-claire,
+.paillasse-sombre,
+.gelose {
+  position: relative;
+  isolation: isolate;
+}
+
+.paillasse-claire::before,
+.paillasse-claire::after,
+.gelose::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.paillasse-claire {
+  background: var(--paillasse-claire-ombre), var(--paillasse-claire-lumiere), var(--paillasse-claire);
+}
+
+.paillasse-claire::before {
+  filter: url(#matiere-marbrure);
+}
+
+.paillasse-claire::after {
+  filter: url(#matiere-grain-fin);
+}
+
+.paillasse-sombre {
+  background: var(--paillasse-sombre);
+  color: var(--surface);
+}
+
+.gelose {
+  background: radial-gradient(circle at 38% 34%, var(--gelose-centre) 0%, var(--gelose-milieu) 55%, var(--gelose-bord) 100%);
+}
+
+.gelose::before {
+  background: var(--grain-base);
+  filter: url(#matiere-grain-gelose);
+}
+
+.filtres-matieres {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---------- Fiche, statique (§ 6.6) ---------- */
+
+.fiche-voile {
+  position: fixed;
+  inset: 0;
+  z-index: var(--plan-voile);
+  background: var(--voile);
+  -webkit-backdrop-filter: blur(var(--flou-fiche));
+  backdrop-filter: blur(var(--flou-fiche));
+}
+
+.fiche {
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--plan-fiche);
+  display: flex;
+  flex-direction: column;
+  width: min(100%, var(--largeur-colonne));
+  height: min(var(--hauteur-fiche), var(--hauteur-fiche-max));
+  margin: 0 auto;
+  border-radius: var(--rayon-4) var(--rayon-4) 0 0;
+  box-shadow: var(--ombre-3), var(--reflet-fiche);
+  color: var(--texte);
+}
+
+.fiche.fiche-sombre {
+  box-shadow: var(--ombre-fiche-sombre);
+  color: var(--surface);
+}
+
+.fiche:focus {
+  outline: none;
+}
+
+.fiche-corps {
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--esp-5) var(--esp-5) calc(var(--esp-6) + env(safe-area-inset-bottom));
+}
+
+/* ---------- Dialogue (§ 6.7) ---------- */
+
+.dialogue-voile {
+  position: fixed;
+  inset: 0;
+  z-index: var(--plan-dialogue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--voile);
+  animation: voile-ouverture var(--duree-moyenne) var(--courbe-sortie) both;
+}
+
+.dialogue-voile.se-ferme {
+  animation: voile-fermeture var(--duree-moyenne) var(--courbe-entree) both;
+}
+
+.dialogue {
+  box-sizing: border-box;
+  width: calc(100% - var(--marge-dialogue));
+  max-width: var(--largeur-dialogue-max);
+  padding: var(--esp-6);
+  border-radius: var(--rayon-3);
+  background: var(--surface);
+  box-shadow: var(--ombre-4);
+  color: var(--texte);
+  animation: dialogue-ouverture var(--duree-moyenne) var(--courbe-sortie) both;
+}
+
+.dialogue-voile.se-ferme .dialogue {
+  animation: dialogue-fermeture var(--duree-moyenne) var(--courbe-entree) both;
+}
+
+.dialogue:focus {
+  outline: none;
+}
+
+.dialogue-titre {
+  margin: 0 0 var(--esp-2);
+  font: var(--texte-titre-2);
+}
+
+.dialogue-texte {
+  margin: 0 0 var(--esp-4);
+  font: var(--texte-corps);
+}
+
+/* Téléphone : boutons empilés, l'action en haut. */
+.dialogue-boutons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+@media (min-width: 601px) {
+  .dialogue-boutons {
+    flex-direction: row-reverse;
+  }
+  .dialogue-boutons > button {
+    flex: 1;
+  }
+}
+
+@keyframes voile-ouverture {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes voile-fermeture {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes dialogue-ouverture {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes dialogue-fermeture {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+@keyframes dialogue-fondu-ouverture {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialogue-fondu-fermeture {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ---------- Scotch (§ 6.9) ---------- */
+
+.scotch-enveloppe {
+  display: inline-block;
+  filter: drop-shadow(var(--ombre-1));
+}
+
+.scotch {
+  display: inline-block;
+  padding: var(--scotch-marge);
+  background: var(--scotch);
+  clip-path: var(--decoupe-scotch);
+  color: var(--scotch-texte);
+  font: var(--texte-ruban);
+  white-space: nowrap;
+}
+
+.scotch.scotch-revision {
+  background: var(--scotch-revision);
+  color: var(--scotch-revision-texte);
+}
+
+/* ---------- Étoiles (§ 6.10) ---------- */
+
+.trio-etoiles {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+}
+
+.trio-colonne {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-1);
+}
+
+.trio-pourcentage {
+  font: var(--texte-legende);
+  font-weight: 700;
+  color: var(--texte-2);
+}
+
+.rangee-etoiles {
+  display: inline-flex;
+  gap: 1px;
+  padding: 2px 4px;
+  border-radius: var(--rayon-pastille);
+  background: var(--pastille);
+}
+
+/* ---------- Mouvement réduit (§ 6.7 du lot 105, § 6.6 du design system) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Dialogue : fondu court, sans échelle. */
+  .dialogue-voile,
+  .dialogue {
+    animation: dialogue-fondu-ouverture var(--duree-courte) linear both;
+  }
+  .dialogue-voile.se-ferme,
+  .dialogue-voile.se-ferme .dialogue {
+    animation: dialogue-fondu-fermeture var(--duree-courte) linear both;
+  }
+  /* Boutons : l'appui reste, sans transition. */
+  .bouton-principal,
+  .bouton-boss,
+  .bouton-tous-les-mondes,
+  .bouton-principal::after,
+  .bouton-boss::after,
+  .bouton-tous-les-mondes::after,
+  .bouton-secondaire,
+  .lien-action,
+  .bouton-icone,
+  .bouton-danger {
+    transition: none;
+  }
+}

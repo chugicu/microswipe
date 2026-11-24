@@ -1,0 +1,19 @@
+/* Mise en page du catalogue seulement (page de vérification, hors coquille) ; toutes les valeurs de composants viennent de client/design/. */
+#catalogue { max-width: var(--largeur-colonne); margin: 0 auto; padding: var(--esp-4); box-sizing: border-box; }
+#catalogue h1 { font: var(--texte-titre-1); margin: 0 0 var(--esp-2); }
+#catalogue h2 { font: var(--texte-titre-2); margin: var(--esp-7) 0 var(--esp-3); }
+#catalogue p { font: var(--texte-corps); margin: 0 0 var(--esp-3); }
+.rangee { display: flex; flex-wrap: wrap; gap: var(--esp-3); align-items: center; margin-bottom: var(--esp-3); }
+.zone { padding: var(--esp-4); border-radius: var(--rayon-2); margin-bottom: var(--esp-3); }
+.zone.gelose { min-height: 64px; display: flex; gap: var(--esp-3); align-items: center; }
+.zone.encre { background: var(--encre); }
+.pastille { width: 72px; font: var(--texte-legende); text-align: center; }
+.pastille i { display: block; height: 36px; border-radius: var(--rayon-1); border: 1px solid var(--bordure); margin-bottom: var(--esp-1); }
+.pastille span { word-break: break-all; }
+#resultats { list-style: none; padding: 0; font: var(--texte-petit); }
+#resultats li::before { content: "● "; }
+#resultats li.ok::before { color: var(--juste); }
+#resultats li.ko::before { color: var(--faux); }
+#resume { font: var(--texte-corps); font-weight: 700; }
+.echelle p { margin: 0 0 var(--esp-2); }
+.matiere { min-height: 96px; margin-bottom: var(--esp-2); border-radius: var(--rayon-2); padding: var(--esp-4); }

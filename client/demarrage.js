@@ -3,9 +3,10 @@ import { demarrerInstallation } from './coquille/installation.js';
 import { demarrerMiseAJour } from './coquille/mise-a-jour.js';
 import { annoncerAppliPrete } from './coquille/accueil.js';
 import { demarrerContenu } from './contenu/demarrage.js';
+import { installerMatieres } from './design/matieres.js';
 
-// Chaque lot suivant ajoute ici son propre démarrage (lot 107 : demarrerContenu), sans l'attendre.
-const DEMARRAGES_BRANCHES = [demarrerContenu];
+// Chaque lot suivant ajoute ici son propre démarrage (lot 105 : installerMatieres, en tête ; lot 107 : demarrerContenu), sans l'attendre.
+const DEMARRAGES_BRANCHES = [installerMatieres, demarrerContenu];
 
 // Une erreur d'un démarrage est écrite et n'empêche ni les autres ni l'affichage.
 function lancer(demarrage) {
