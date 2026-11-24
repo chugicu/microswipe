@@ -26,6 +26,9 @@ function afficherLaCoquilleVide() {
   conteneur.append(logo);
 }
 
+// Safari sur iPhone ignore user-scalable=no : on coupe le pincement à la main.
+document.addEventListener('gesturestart', (evenement) => evenement.preventDefault());
+
 lancer(demarrerInstallation);
 lancer(() => demarrerMiseAJour({ pendantLAccueil: true }));
 DEMARRAGES_BRANCHES.forEach(lancer);
