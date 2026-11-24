@@ -4,8 +4,8 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 ## État
 
-- Dernier lot fait : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
-- Prochain lot : **104** ou **301** (ne dépendent que du 101) ; le lot 107 dépend de 102, 103 et 104.
+- Dernier lot fait : **104** (stockage local IndexedDB), le 23 novembre 2026, page de vérification passée dans Chrome et Safari (ordinateur). Avant lui : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
+- Prochain lot : **301** (ne dépend que du 101) ; le lot 107 dépend de 102, 103 et 104 (tous trois faits).
 
 ## Environnement
 
@@ -110,6 +110,28 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - `client/demarrage.js` : `DEMARRAGES_BRANCHES` (liste de fonctions), ordre fixé par la spec § 6.7.
 - **Tests** : `tests/client/coquille/regles-sw.test.js` (1 à 3), `regles.test.js` (4 à 7), `coherence.test.js` (8 à 12).
 
+### Lot 104
+
+**Règles pour les lots suivants (107, 208, 209, 309…)**
+
+- **Un lot qui a besoin d'un magasin ou d'un index ajoute une migration à la fin de `MIGRATIONS`** (`client/stockage/migrations.js`), avec la version suivante ; **une migration enregistrée n'est jamais modifiée, renumérotée ni retirée**. Aucune migration ne supprime un magasin ni des données (à demander à l'auteur). Un magasin et son index peuvent être dans la même migration. Un lot qui ajoute une migration ajoute aussi sa migration aux tests : le test 9 vérifie que la liste réelle tient les règles.
+- **Règle du travail des transactions** : dans `travail`, n'attends que les opérations de `t`. Attendre autre chose (réseau, minuterie, autre base) laisse le navigateur clore la transaction : ce qui a été écrit avant est enregistré, et l'opération suivante rejette `transaction_inactive`. Lis ce qu'il faut avant la transaction, calcule dedans sans rien attendre d'autre (lots 107, 208, 309).
+- **`creerBaseEnMemoire` sert aux tests ; elle n'est jamais importée par `client/`** (test 11). Elle ne détecte pas la règle du travail : seule la page de vérification le peut.
+- **Un échec d'ouverture n'arrête pas le jeu** : `ouvrirBaseDuJeu()` rejette `stockage_indisponible` (navigation privée, IndexedDB absent…) ; le lot garde alors ses données en mémoire (specs 208 § 6.7 et 309 § 6.5). Les lots n'appellent jamais `ouvrirBase` pour la base de l'appli. Ce lot n'appelle pas `ouvrirBaseDuJeu` au démarrage : le premier lot qui s'en sert est le 107 (qui branche son démarrage dans `DEMARRAGES_BRANCHES`).
+- **Événement `base-perimee`** (lot 103, voir « Points à vérifier ») : `base.evenements` (`EventTarget`) l'émet quand un autre onglet a demandé une version plus récente ; la base est alors déjà fermée (toute opération rejette `base_fermee`). Personne ne l'écoute encore.
+- Jamais de suppression de la base `microbio` (aucune fonction du client n'en a). Seule la page de vérification supprime sa base d'essai `microbio-essai-104`.
+
+**Fichiers et signatures** (toutes les fonctions de la base rendent une promesse)
+
+- `client/stockage/regles.js` (pur) : `CODES_D_ERREUR` (les quinze codes du § 6.1), `creerErreurDeStockage(code)`, `estCleValide(cle)`, `comparerCles(a, b)`, `extraireCle(valeur, cheminDeCle)`, `bornesDuPrefixe(prefixe)` → `{ depuis, jusqua }`, `validerMigrations(migrations)` → `[{ version, regle }]`, `simulerSchema(migrations)` → `{ version, magasins: { <nom>: { cle, index: { <nom>: { cle, unique } } } } }`, `migrationsAAppliquer(migrations, ancienneVersion)`, `verifierRequete(requete, schemaDuMagasin)` → `{ index, depuis, jusqua, limite }` (`null` quand absent ; `cle` et `prefixe` deviennent des bornes incluses).
+- `client/stockage/migrations.js` : `NOM_BASE` (`microbio`), `MIGRATIONS` (la migration 1, sans étape).
+- `client/stockage/base-locale.js` : `ATTENTE_BLOCAGE_MS` (5000), `ouvrirBase({ nom, migrations, fabrique })` → base, `ouvrirBaseDuJeu()` → base (gardée ; un rejet est oublié, l'appel suivant réessaie). Seul fichier du client à citer `indexedDB`.
+- **La base** (réelle ou en mémoire) : `version`, `schema`, `evenements`, `lire(magasin, cle)` (`null` si absent), `lireTout(magasin, requete)`, `compter(magasin, requete)`, `ecrire(magasin, valeur)` → la clé, `ecrirePlusieurs(magasin, valeurs)` → tableau des clés, `supprimer(magasin, cle)`, `supprimerPlusieurs(magasin, cles)`, `vider(magasin)`, `transaction(magasins, 'lecture' | 'ecriture', travail)`, `fermer()`. Requête : `{ index, cle | prefixe | depuis et/ou jusqua, limite }` (voir spec § 6.5). `t` (dans `travail`) : `lire`, `lireTout`, `compter`, `ecrire`, `supprimer`, `vider`, qui prennent le nom du magasin en premier argument.
+- `tests/client/stockage/base-memoire.js` : `creerBaseEnMemoire({ migrations, versionEnregistree })` → promesse d'une base de même interface, avec en plus `rouvrir(nouvellesMigrations)` (même données ; l'ancienne base se ferme et émet `base-perimee` si la version monte).
+- `tests/client/stockage/scenarios.js` : `SCENARIOS` (1 à 13), `MIGRATIONS_D_ESSAI`, `attendreCode(promesse, code)`. Un scénario reçoit `{ ouvrir(migrations) }`. Un lot qui teste son dépôt avec `creerBaseEnMemoire` peut réutiliser `MIGRATIONS_D_ESSAI` ou écrire ses propres migrations.
+- `tests/navigateur/stockage.html` et `stockage.js` : page de vérification (15 scénarios), à servir par un petit serveur local (par exemple `python3 -m http.server`, depuis la racine du dépôt) et à ouvrir à `/tests/navigateur/stockage.html`, puis « Lancer ».
+- **Tests** : `tests/client/stockage/regles.test.js` (1 à 9), `base-memoire.test.js` (10 et 11), `base-locale.test.js` (12 à 15, hors liste de la spec : ouverture sans navigateur, critères 2 à 4 vérifiés dans les fichiers).
+
 ## Décisions
 
 - 23 novembre 2026 (lot 103, après essai sur téléphone) : la coquille se zoomait et se déplaçait dans tous les sens ; sur le choix de l'auteur, zoom par pincement, déplacement horizontal et rebond de la page sont bloqués (`maximum-scale=1, user-scalable=no`, `touch-action: pan-y`, `overscroll-behavior: none`, `gesturestart` annulé pour l'iPhone). Le défilement vertical reste. Contrepartie : plus d'agrandissement du texte par pincement. `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passent à 2. Publié le 23 novembre ; installé sur le téléphone de l'auteur : icône correcte. Vérifié par l'auteur sur Safari (iPhone) avec la version 2 : ni zoom ni déplacement. Critère 7 : icône et affichage vus ; mode avion, installation sous Android et critères 3 et 4 (navigateur de bureau) restent à vérifier.
@@ -126,6 +148,8 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - 23 novembre 2026 (lot 103) : le logo discret de la coquille vide reprend la taille et le rayon de la barre du haut (36 px, rayon 10, design system § 9.14), centré dans la colonne : le design system ne donne pas de taille propre à la coquille vide. L'accueil n'a pas d'indice `z-index` (le design system n'en fixe pas pour lui) : il passe au-dessus du contenu parce qu'il est positionné ; **un lot qui positionne ses éléments avec un `z-index` doit vérifier que l'accueil reste au-dessus.**
 - 23 novembre 2026 (lot 103) : la police de l'accueil est celle du système ; `client/polices/` (design system § 4.1) n'existe pas encore : les lots qui l'ajoutent l'inscrivent dans `FICHIERS_DE_LA_COQUILLE`.
 - 23 novembre 2026 (lot 103) : sans transition possible (accueil jamais peint avant la disparition, ou animations réduites), il disparaît sans fondu.
+- 23 novembre 2026 (lot 104) : précisions prises là où la spec se taisait, dans son esprit. Liste de migrations vide → défaut `version` (la base ne s'ouvre pas à la version 0). Bornes `depuis` > `jusqua` → `requete_invalide` (le navigateur les refuse aussi). `depuis` ou `jusqua` seul est admis. Une requête non objet → `requete_invalide`. `mode` autre que `lecture` / `ecriture` → `transaction_echouee` ; liste de magasins vide ou magasin inconnu → `magasin_inconnu`. `ecrirePlusieurs` rend le tableau des clés. Dans une transaction, seules `magasin_hors_transaction` et `transaction_en_lecture` annulent d'office la transaction, même si `travail` attrape l'erreur ; les autres erreurs d'opération ne l'annulent que si `travail` les laisse remonter (sauf violation d'unicité d'index, que le navigateur annule). Un enregistrement dont la clé d'index est absente ou invalide n'est pas dans l'index (comme le navigateur). `ouvrirBase` : une mise à niveau qui échoue pour une raison inconnue après son début → `migration_echouee` ; si `base_bloquee` a été rendu, une mise à niveau qui démarre ensuite est annulée et la connexion fermée (rien ne change après l'échec annoncé).
+- 23 novembre 2026 (lot 104) : trois fichiers de `client/stockage/` ajoutés à `FICHIERS_DE_LA_COQUILLE`, `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passés de 2 à 3 (règle du lot 103). `client/demarrage.js` inchangé.
 - Rien n'est poussé : le commit du lot 102 est sur `dev`, local ; le push attend l'accord de l'auteur.
 
 ## Points à vérifier
@@ -135,6 +159,8 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - Les règles `git commit -n` ne voient pas un drapeau groupé (`-an`) ; seul le crochet le couvrirait, et il ne voit pas les options.
 - Rapport du test 11 : 102 identifiants au format du tableur, tous dans des tableaux de formats ou des exemples des documents copiés (briefing, schéma, specs 101, 305, 505, 506) ; relu par l'auteur avant l'envoi de `dev`.
 - Lot 103, vérifications faites dans Chrome (Claude in Chrome), en local le 23 novembre : critère 3 (service worker actif, cache `microbio-coquille-v2` de 19 fichiers, page rechargée serveur coupé, aucune erreur console) et critère 4 (versions passées à 3 : à la 1re ouverture, aucun rechargement et la version 3 attend ; à la suivante, un seul rechargement, cache v3 en place, v2 supprimé, cache fictif `carnet-rea-essai` conservé ; versions remises à 2). Observation : dans cet essai, l'application de la version en attente a pris plusieurs secondes (onglet Chrome en arrière-plan, probablement) pendant lesquelles l'accueil est resté affiché : il n'a pas de délai maximal (la spec n'en fixe pas). Si un téléphone montre un accueil qui dure trop, à signaler à l'auteur. Critère 7 confirmé par l'auteur le 23 novembre : installation sur iPhone (icône, plein écran, mode avion) et sous Android. Le navigateur intégré à Claude Code ne gère pas les service workers. Un `404` sur `favicon.ico` est normal (aucun favicon dans le lot).
+- **Lot 104 — question ouverte, `base-perimee`** : le § 6 (décision 6) de la spec dit que « proposer de recharger la page est l'affaire du lot 103 », or le lot 103 n'a rien prévu pour cet événement (ni `mise-a-jour.js`, ni les specs 103). Rien n'est codé : l'événement existe sur `base.evenements`, personne ne l'écoute. À décider avec l'auteur : quel lot écoute l'événement et affiche la proposition (lot 107, premier utilisateur de la base ? un lot dédié ?).
+- **Lot 104, vérifications dans un navigateur** (page `tests/navigateur/stockage.html`, servie en local, le 23 novembre) : **Chrome 156 (macOS), via Claude in Chrome** : les 15 scénarios réussissent, `microbio-essai-104` n'existe plus (`indexedDB.databases()` vide). En plus, sur une base jetable (hors dépôt, console) : `migration_echouee` (index unique sur des doublons : la base reste en version 1, données intactes), `base_bloquee` au bout de 5,0 s (une connexion qui ignore `versionchange` ; la base reste en version 1 après le déblocage), `base-perimee` émis une fois et ancienne base fermée (`base_fermee`). **Safari (ordinateur), passé par l'auteur le 23 novembre** : « 15 scénarios réussis » (version de Safari et dernière ligne sur la base d'essai non précisées ; le scénario 14 réussit donc aussi, pas d'écart avec Chromium). Non testés : iPhone (lot 108), Firefox. Le navigateur intégré à Claude Code n'a pas été utilisé.
 - Licence du dépôt : non choisie (point signalé de l'index).
 
 ## Idées notées
@@ -144,5 +170,6 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 ## Reste
 
 - Lot 103 : terminé et publié (Pages activé, `main` avancée le 23 novembre jusqu'à 57d26d6, critères 1 à 9 vérifiés). Les notes de PROGRESS.md postérieures sont sur `dev`.
-- Lots 104, 105 et 106 (specs à écrire), 107, 108.
+- Lot 104 : décision sur l'écoute de `base-perimee` ; publication (avance de `main`) seulement avec l'accord de l'auteur.
+- Lots 105 et 106 (specs à écrire), 107, 108.
 - `main` n'avance qu'avec l'accord de l'auteur.
