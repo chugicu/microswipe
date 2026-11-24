@@ -76,3 +76,148 @@ body {
     transition: none;
   }
 }
+
+/* Dialogue de confirmation, ici celui du rechargement (§ 9.11, § 5.4 plan 60, § 7.6 ouverture, § 9.1 boutons, § 6.6 mouvement réduit). */
+:root {
+  --surface: #FFFFFF;
+  --texte: #15202E;
+  --voile: rgba(10, 16, 28, 0.46);
+  --bleu: #2B5FD9;
+  --encre: #1B2433;
+  --encre-haut: #2A3850;
+  --encre-ombre: #070B12;
+  --gris-sur-encre: #AEB8C6;
+  --ombre-2: 0 4px 12px rgba(20, 30, 50, 0.16);
+  --ombre-4: 0 8px 20px rgba(0, 0, 0, 0.28);
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-6: 24px;
+  --rayon-3: 16px;
+  --duree-contact: 80ms;
+  --duree-courte: 120ms;
+}
+
+.dialogue-voile {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--voile);
+  animation: apparition var(--duree-moyenne) var(--courbe-sortie) both;
+}
+
+.dialogue {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 400px;
+  padding: var(--esp-6);
+  border-radius: var(--rayon-3);
+  background: var(--surface);
+  box-shadow: var(--ombre-4);
+  color: var(--texte);
+  animation: ouverture-dialogue var(--duree-moyenne) var(--courbe-sortie) both;
+}
+
+.dialogue:focus {
+  outline: none;
+}
+
+.dialogue-titre {
+  margin: 0 0 var(--esp-2);
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.dialogue-texte {
+  margin: 0 0 var(--esp-4);
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* Téléphone : boutons empilés, l'action en principal d'abord. */
+.dialogue-boutons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+@media (min-width: 601px) {
+  .dialogue-boutons {
+    flex-direction: row-reverse;
+  }
+  .dialogue-boutons button {
+    flex: 1;
+  }
+}
+
+.dialogue button {
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dialogue button:focus-visible {
+  outline: 3px solid var(--bleu);
+  outline-offset: 2px;
+}
+
+.bouton-principal {
+  height: 60px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(var(--encre-haut), var(--encre));
+  box-shadow: 0 5px 0 var(--encre-ombre), inset 0 1px 0 var(--gris-sur-encre), var(--ombre-2);
+  color: var(--creme);
+  font-size: 19px;
+  font-weight: 800;
+  transition: transform var(--duree-contact) cubic-bezier(0.4, 0, 0.2, 1), box-shadow var(--duree-contact) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bouton-principal:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--encre-ombre), inset 0 1px 0 var(--gris-sur-encre), var(--ombre-2);
+}
+
+.bouton-secondaire {
+  height: 50px;
+  border: 1.5px solid #B8C3D1;
+  border-radius: var(--rayon-3);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--texte);
+  font-size: 16px;
+  font-weight: 700;
+  transition: transform var(--duree-contact) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bouton-secondaire:active {
+  transform: scale(0.97);
+}
+
+@keyframes ouverture-dialogue {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ouverture-dialogue-reduite {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Mouvement réduit : ni échelle ni déplacement, un fondu de 120 ms. */
+@media (prefers-reduced-motion: reduce) {
+  .dialogue-voile {
+    animation: apparition var(--duree-courte) linear both;
+  }
+  .dialogue {
+    animation: ouverture-dialogue-reduite var(--duree-courte) linear both;
+  }
+  .bouton-principal,
+  .bouton-secondaire {
+    transition: none;
+  }
+}

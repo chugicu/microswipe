@@ -2,9 +2,10 @@
 import { demarrerInstallation } from './coquille/installation.js';
 import { demarrerMiseAJour } from './coquille/mise-a-jour.js';
 import { annoncerAppliPrete } from './coquille/accueil.js';
+import { demarrerContenu } from './contenu/demarrage.js';
 
 // Chaque lot suivant ajoute ici son propre démarrage (lot 107 : demarrerContenu), sans l'attendre.
-const DEMARRAGES_BRANCHES = [];
+const DEMARRAGES_BRANCHES = [demarrerContenu];
 
 // Une erreur d'un démarrage est écrite et n'empêche ni les autres ni l'affichage.
 function lancer(demarrage) {

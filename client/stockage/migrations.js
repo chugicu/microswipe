@@ -20,4 +20,10 @@ export const MIGRATIONS = [
     description: 'Création de la base',
     etapes: [],
   },
+  {
+    version: 2,
+    lot: '107',
+    description: 'Paquets de contenu',
+    etapes: [{ etape: 'creerMagasin', magasin: 'contenu', cle: 'type' }],
+  },
 ];
