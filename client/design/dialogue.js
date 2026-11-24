@@ -15,7 +15,7 @@ function ouvrirVraiment(entree) {
   const voile = document.createElement('div');
   voile.className = 'dialogue-voile';
   const dialogue = document.createElement('div');
-  dialogue.className = 'dialogue';
+  dialogue.className = 'dialogue paillasse-claire';
   dialogue.setAttribute('role', 'dialog');
   dialogue.setAttribute('aria-modal', 'true');
   dialogue.setAttribute('aria-labelledby', `${identifiant}-titre`);

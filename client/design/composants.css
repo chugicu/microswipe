@@ -310,7 +310,7 @@ body {
   padding: var(--esp-5) var(--esp-5) calc(var(--esp-6) + env(safe-area-inset-bottom));
 }
 
-/* ---------- Dialogue (§ 6.7) ---------- */
+/* ---------- Dialogue (§ 6.7) : matière .paillasse-claire et reflet de la fiche, pas --surface (design system, décision 18, qui l'emporte sur le § 9.11) ---------- */
 
 .dialogue-voile {
   position: fixed;
@@ -333,8 +333,7 @@ body {
   max-width: var(--largeur-dialogue-max);
   padding: var(--esp-6);
   border-radius: var(--rayon-3);
-  background: var(--surface);
-  box-shadow: var(--ombre-4);
+  box-shadow: var(--ombre-4), var(--reflet-fiche);
   color: var(--texte);
   animation: dialogue-ouverture var(--duree-moyenne) var(--courbe-sortie) both;
 }
