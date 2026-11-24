@@ -1,0 +1,74 @@
+/* Styles de la coquille : fond de l'appli, colonne centrée et écran d'accueil au logo (design system § 3.1, § 3.10, § 5.4, § 6, § 7.7, § 9.14). */
+
+:root {
+  --fond: #EEF2F6;
+  --creme: #FFE9B0;
+  --esp-4: 16px;
+  --duree-moyenne: 240ms;
+  --courbe-sortie: cubic-bezier(0.2, 0.9, 0.25, 1);
+  --courbe-entree: cubic-bezier(0.4, 0, 1, 1);
+  --largeur-colonne: 480px;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--fond);
+  font-family: system-ui, sans-serif;
+}
+
+/* Colonne au plus de 480 px, centrée, sans message en paysage ou sur grand écran. */
+#appli {
+  box-sizing: border-box;
+  max-width: var(--largeur-colonne);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo discret de la coquille vide : taille et rayon de la barre du haut (§ 9.14). */
+#appli .logo-discret {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+#accueil {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--creme);
+  transition: opacity var(--duree-moyenne) var(--courbe-entree);
+}
+
+#accueil img {
+  width: 160px;
+  height: auto;
+  animation: apparition var(--duree-moyenne) var(--courbe-sortie) both;
+}
+
+#accueil.accueil-masque {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes apparition {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Téléphone réglé pour réduire les animations : ni apparition ni disparition progressive. */
+@media (prefers-reduced-motion: reduce) {
+  #accueil,
+  #accueil img {
+    animation: none;
+    transition: none;
+  }
+}

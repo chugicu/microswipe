@@ -4,13 +4,13 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 ## État
 
-- Dernier lot fait : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
-- Prochain lot : **103**, **104** ou **301** (ne dépendent que du 101) ; le lot 107 dépend de 102, 103 et 104.
+- Dernier lot fait : **103** (coquille PWA), le 23 novembre 2026, **sauf** l'activation de GitHub Pages, la publication et les vérifications sur téléphone (voir « Reste »). Avant lui : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
+- Prochain lot : **104** ou **301** (ne dépendent que du 101) ; le lot 107 dépend de 102, 103 et 104.
 
 ## Environnement
 
 - Node 26.13.1 (22 ou plus requis), git 2.56.1, Claude Code 2.1.126. `gh` n'est pas installé : le dépôt distant a été créé à la main sur github.com.
-- Dépôt : `chugicu/microswipe` (public), adresse prévue `https://chugicu.github.io/microswipe/` (GitHub Pages non activé : lot 103).
+- Dépôt : `chugicu/microswipe` (public), adresse prévue `https://chugicu.github.io/microswipe/` (GitHub Pages non activé : à faire avec l'auteur, lot 103).
 - Branche de travail : `dev`. `main` n'a reçu que le premier commit.
 - **Après un clone : `git config core.hooksPath .githooks`** (le crochet ne s'active que par cette commande).
 - Identité git du dépôt : nom `chugicu`, adresse `noreply` de GitHub.
@@ -80,6 +80,36 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
   - Le mot `Statut` n'est lu nulle part dans `client/donnees-fictives/` : l'assemblage n'applique que les listes de `ATTENDU_FICTIF`.
 - **Tests** : `tests/client/contenu/forme-du-paquet.test.js` (1 à 6, avec une cinquantaine de sous-cas) et `tests/client/donnees-fictives/paquets-fictifs.test.js` (7 à 20). Le test 14 recalcule les questions servies et leurs motifs à part, sans `ATTENDU_FICTIF`.
 
+### Lot 103
+
+**Règles pour tous les lots suivants**
+
+- **Tout lot qui modifie un fichier servi au téléphone augmente `VERSION_CLIENT` (`client/version.js`) et `VERSION_DE_LA_COQUILLE` (`sw.js`, une seule ligne) de 1, et ajoute ses fichiers à `FICHIERS_DE_LA_COQUILLE`** (`client/coquille/sw/regles-sw.js`). Les tests 8 et 9 échouent sinon. Un fichier de `client/verifications/` (lot 108) est hors coquille.
+- **Chaque lot branche son démarrage dans `client/demarrage.js`**, en l'ajoutant à `DEMARRAGES_BRANCHES`, sans l'attendre (lot 107 : `demarrerContenu`). Une erreur est écrite par `console.error` et n'arrête rien.
+- **Le lot 107 appelle `definirFournisseurDuLogo`** avec la lecture de `accueil.logo` dans le paquet « internes » rangé.
+- Aucun appel à `caches` hors `sw.js` ; aucun `fetch(` dans `client/` (test 11).
+- **Limite acceptée** : une appli installée que l'interne ne ferme jamais reçoit la mise à jour quand le téléphone la ferme lui-même.
+- **Publication** (§ 6.9) : adresse publique `https://chugicu.github.io/microswipe/` ; à chaque publication, accord de l'auteur, avance rapide de `main` jusqu'à `dev`, jamais de contenu réel. La version publiée est vue comme « production » par `choisirEnvironnement` (lot 301) et par le droit provisoire du mode test (lot 213) : le mode test n'y est pas proposé, c'est voulu.
+
+**Qui affiche quoi** (invitation à installer)
+
+| Lot | Affichage |
+|---|---|
+| 106 | Ligne de Profil (`TEXTES_INSTALLATION.ligneProfil`) tant que `installee` est faux et que `moyen` n'est pas `aucun` ; un appui ouvre la carte d'invitation. |
+| 207 | Place sur l'écran de fin de niveau pour la carte : titre, texte, puis `consignes` (iPhone : `consignesIphone`) ou bouton `Installer` (`bouton`), et `Plus tard`. |
+| 208 | Après chaque fin de partie enregistrée (hors mode test) : `doitInviterApresPartie(somme des tentatives des lignes du compte, installee)` vrai et `moyen` ≠ `aucun` → demander la carte. Rien d'autre n'est stocké. « Plus tard » ne laisse aucune trace. |
+
+**Fichiers et signatures**
+
+- `index.html`, `manifest.webmanifest`, `sw.js`, `.nojekyll` (racine). `client/version.js` : `VERSION_CLIENT` (1). Icônes : `client/images/icone-192.png`, `icone-512.png`, `icone-apple-180.png` (faites avec `sips`, outil non versionné). Feuille de style : `client/coquille/coquille.css` (variables du design system § 3.1, § 3.10, § 5.4, § 6).
+- `client/coquille/sw/regles-sw.js` (classique, CommonJS pour Node grâce à son `package.json`) : `PREFIXE_DES_CACHES`, `DOSSIERS_HORS_COQUILLE`, `FICHIERS_DE_LA_COQUILLE`, `nomDuCache(version)`, `cachesASupprimer(noms, version)`, `strategiePour({ methode, url, mode }, portee, fichiers)` → `page` | `coquille` | `reseau` | `ignorer`.
+- `client/coquille/regles.js` (ES, pur) : `DUREE_ACCUEIL_MS`, `CLE_LOGO_A_L_OUVERTURE`, `logoActive(reglages)`, `doitMasquerLAccueil({ ecouleMs, appliPrete, toucher, logo })`, `PARTIES_D_INVITATION`, `estInstallee({ affichageAutonome, standaloneIos })`, `moyenDInstallation({ agentUtilisateur, pointsDeContact, invitationNative })`, `doitInviterApresPartie(n, installee)`, `TEXTES_INSTALLATION`.
+- `client/coquille/accueil.js` : `definirFournisseurDuLogo(fn)` (`fn()` → promesse d'un booléen), `annoncerAppliPrete()`, `accueilTermine` (promesse), et `retenirAccueil()` (ajout, voir Décisions) → fonction qui libère, ou `null` si l'accueil a déjà disparu.
+- `client/coquille/mise-a-jour.js` : `demarrerMiseAJour({ pendantLAccueil })` (promesse), `versionEnAttente()`.
+- `client/coquille/installation.js` : `demarrerInstallation()`, `etatDeLInstallation()` → `{ installee, moyen }`, `lancerInstallationNative()` → promesse de `acceptee` | `refusee` | `indisponible`, `evenements` (`EventTarget`, événement `installation-changee`).
+- `client/demarrage.js` : `DEMARRAGES_BRANCHES` (liste de fonctions), ordre fixé par la spec § 6.7.
+- **Tests** : `tests/client/coquille/regles-sw.test.js` (1 à 3), `regles.test.js` (4 à 7), `coherence.test.js` (8 à 12).
+
 ## Décisions
 
 - 17 novembre 2026 : `.claude/settings.local.json` créé avec des refus d'`Edit` sur les dossiers locaux de Carnet Réa et d'EchoLearn trouvés sur l'ordinateur (l'auteur pensait ne rien avoir en local ; des copies existent, il n'a pas désigné lesquelles, la règle large a été prise par prudence).
@@ -88,6 +118,12 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 - 23 novembre 2026 (lot 102) : la spec ne fixe pas la forme de `ATTENDU_FICTIF` : forme retenue ci-dessus (listes d'`ID`, `faits` en `ID` → colonnes, `null` pour « toutes »). Autres précisions prises, dans l'esprit de la spec : une ligne sans `ID` lisible est désignée par sa position (`ligne-N`) ; une entrée de `etatDesQuestions` doit avoir exactement les deux clés `servie` et `motifs` ; un `ID` absent ou non texte ne donne que le défaut `id` (pas aussi `valeur_non_texte`) ; avec un type inconnu, `etatDesQuestions` n'est ni attendu ni inattendu ; l'ordre des clés de `compositionPrevue` suit l'ordre des niveaux.
 - 23 novembre 2026 (lot 102) : le fichier `lignes-fictives.js` contient le mot `Statut` en plus des en-têtes et des lignes : dans la petite fonction qui remplit les colonnes de validation d'une ligne (données, pas assemblage). `paquets-fictifs.js` ne le contient pas.
+- 23 novembre 2026 (lot 103) : **`theme_color` = `#EEF2F6` (`--fond`)**, barre d'état de l'iPhone `default` ; le design system n'en fixait aucune, l'auteur a choisi `--fond`. Le même `#EEF2F6` est dans la balise `theme-color` de `index.html`.
+- 23 novembre 2026 (lot 103) : mise à jour. Seule une version **déjà en attente à l'ouverture** s'applique (message `passer`, un rechargement, accueil retenu) ; une version trouvée pendant cette ouverture attend la suivante (critère 4 : « à la première ouverture, rien ne change »). Pour retenir l'accueil pendant le rechargement, `accueil.js` expose `retenirAccueil()`, ajout non listé dans le § 6.4 mais nécessaire à « avant que l'accueil disparaisse ». Message `passer` = la chaîne `'passer'`.
+- 23 novembre 2026 (lot 103) : `strategiePour` ne rend `page`/`coquille`/`reseau` que pour `GET` ; tout autre méthode → `ignorer`. `sw.js` répond aux requêtes `reseau` par un appel réseau direct, sans rien ranger.
+- 23 novembre 2026 (lot 103) : le logo discret de la coquille vide reprend la taille et le rayon de la barre du haut (36 px, rayon 10, design system § 9.14), centré dans la colonne : le design system ne donne pas de taille propre à la coquille vide. L'accueil n'a pas d'indice `z-index` (le design system n'en fixe pas pour lui) : il passe au-dessus du contenu parce qu'il est positionné ; **un lot qui positionne ses éléments avec un `z-index` doit vérifier que l'accueil reste au-dessus.**
+- 23 novembre 2026 (lot 103) : la police de l'accueil est celle du système ; `client/polices/` (design system § 4.1) n'existe pas encore : les lots qui l'ajoutent l'inscrivent dans `FICHIERS_DE_LA_COQUILLE`.
+- 23 novembre 2026 (lot 103) : sans transition possible (accueil jamais peint avant la disparition, ou animations réduites), il disparaît sans fondu.
 - Rien n'est poussé : le commit du lot 102 est sur `dev`, local ; le push attend l'accord de l'auteur.
 
 ## Points à vérifier
@@ -96,6 +132,7 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - Règle de refus `git config *core.hooksPath*` : elle bloque aussi la simple lecture (`git config core.hooksPath`) dans une session Claude Code. Le test 7 la lit par Node, sans passer par cette règle.
 - Les règles `git commit -n` ne voient pas un drapeau groupé (`-an`) ; seul le crochet le couvrirait, et il ne voit pas les options.
 - Rapport du test 11 : 102 identifiants au format du tableur, tous dans des tableaux de formats ou des exemples des documents copiés (briefing, schéma, specs 101, 305, 505, 506) ; relu par l'auteur avant l'envoi de `dev`.
+- Lot 103, **non vérifié** : (a) le navigateur intégré à Claude Code refuse tout enregistrement de service worker (même un script d'essai trivial) : les critères 3 et 4 du § 9 (service worker actif, cache v1, hors ligne, passage à la version 2) n'ont **pas** été faits dans un navigateur ; `sw.js` a seulement été exécuté dans Node avec de fausses API (installation, activation, nettoyage sans toucher à un cache d'une autre appli, réponses par stratégie, message `passer`) ; (b) critère 7 (Android, iPhone, mode avion) : après publication, avec l'auteur ; (c) un `404` sur `favicon.ico` est normal (aucun favicon dans le lot).
 - Licence du dépôt : non choisie (point signalé de l'index).
 
 ## Idées notées
@@ -104,5 +141,6 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 ## Reste
 
-- Lots 103 (première publication sur GitHub Pages), 104, 105 et 106 (specs à écrire), 107, 108.
-- Activer GitHub Pages et avancer `main` : seulement avec l'accord de l'auteur, à partir du lot 103.
+- Lot 103, étapes de l'auteur : activer GitHub Pages (source branche `main`, dossier racine), pousser `dev`, accepter l'avance rapide de `main` jusqu'à `dev`, vérifier `https://chugicu.github.io/microswipe/` puis le critère 7 sur téléphone ; critères 3 et 4 à faire dans Chrome.
+- Lots 104, 105 et 106 (specs à écrire), 107, 108.
+- `main` n'avance qu'avec l'accord de l'auteur.
