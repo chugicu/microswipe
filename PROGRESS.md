@@ -4,8 +4,8 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 ## État
 
-- Dernier lot fait : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
-- Prochain lot : **102** (format du paquet de contenu et jeu de données fictif). Les lots 103, 104 et 301 ne dépendent que du 101.
+- Dernier lot fait : **102** (format du paquet de contenu et jeu de données fictif), le 23 novembre 2026. Avant lui : **101** (dépôt, garde-fous, `node --test`, `PROGRESS.md`, documents dans `docs/`), le 17 novembre 2026.
+- Prochain lot : **103**, **104** ou **301** (ne dépendent que du 101) ; le lot 107 dépend de 102, 103 et 104.
 
 ## Environnement
 
@@ -25,7 +25,7 @@ Mémoire du projet d'une session à l'autre : lis ce fichier en premier, mets-le
 
 | Dossier | Contenu | Créé par |
 |---|---|---|
-| `client/` | Code du téléphone, modules ES natifs. | Lots 102 et suivants (le lot 101 n'y met que le logo, dans `client/images/`). |
+| `client/` | Code du téléphone, modules ES natifs. | Lots 102 et suivants (le lot 101 n'y met que le logo, dans `client/images/`). Lot 102 : `client/contenu/`, `client/donnees-fictives/`. |
 | `serveur/` | Code Apps Script ; chargé en CommonJS par Node grâce à `serveur/package.json`. | Lot 301. |
 | `tests/client/`, `tests/serveur/`, `tests/integration/` | Tests Node, rangés comme le code qu'ils testent. | Lots suivants. |
 | `tests/navigateur/` | Pages de vérification à ouvrir dans un navigateur ; jamais lancées par `node --test`. | Lots 104 et suivants. |
@@ -62,11 +62,33 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 - **Documents copiés** : `CLAUDE.md` ; `docs/briefing.md`, `architecture.md`, `schema-de-donnees.md`, `plan-de-developpement.md`, `design-system.md` ; `docs/specs/index.md` et vingt specs `docs/specs/lot-N.md`. `docs/design-system.md` est présent : les lots 105 et 106 peuvent commencer.
 - **Tests** : `tests/outillage/modules.test.js` (1 à 3), `garde-fous.test.js` (4 à 8), `documents.test.js` (9 à 12). Le test 11 est un rapport : il n'échoue jamais et écrit fichier, ligne et identifiant.
 
+### Lot 102
+
+- **`client/contenu/forme-du-paquet.js`** (module pur, lots 107 et 307) :
+  - `controlerFormeDuPaquet(paquet)` → tableau de défauts `{ regle, chemin }`, vide si la forme est bonne ; ne modifie pas son argument. Règles : `objet`, `type`, `cle_manquante`, `cle_inattendue`, `version`, `date`, `section`, `id`, `valeur_non_texte`, `colonne_reservee`, `faits`, `composition_prevue`, `reglages`, `etat_des_questions`. Le chemin n'a jamais de valeur du contenu : `questions/Q-000003/Énoncé`, `faits/Faits_fictifs/FF-02`, `reglages/etoiles.seuil_1` ; une ligne sans `ID` lisible est désignée par sa position : `questions/ligne-3/ID`.
+  - Constantes exportées : `TYPES_DE_PAQUET`, `SECTIONS_DE_LIGNES`, `CLES_DU_PAQUET`, `CLE_ETAT_DES_QUESTIONS`, `COLONNES_RESERVEES`, `MODELE_DATE_UTC`.
+- **`client/donnees-fictives/paquets-fictifs.js`** (lots 107, 201, 208, 213, 401) :
+  - `paquetInternesFictif()` et `paquetAdminFictif()` → un **nouvel** objet à chaque appel, de la forme de `lot-306.md` § 6.2 (clés dans l'ordre : `type`, `versionContenu`, `genereLe`, `mondes`, `niveaux`, `composition`, `questions`, `faits`, `compositionPrevue`, `reglages`, puis `etatDesQuestions` pour « admin »).
+  - `ATTENDU_FICTIF` = `{ internes, admin }`. Chaque côté : `mondes`, `niveaux`, `questions`, `composition` (listes d'`ID`, dans l'ordre), `faits` (`{ <Onglet>: { <ID>: <colonnes servies> | null } }`, `null` = toutes les colonnes), `compositionPrevue`. En plus : `internes.colonnes` (colonnes servies des quatre sections) et `admin.etatDesQuestions`.
+- **`client/donnees-fictives/lignes-fictives.js`** : les lignes complètes (`LIGNES_MONDES`, `LIGNES_NIVEAUX`, `LIGNES_COMPOSITION`, `LIGNES_QUESTIONS`, `LIGNES_FAITS_FICTIFS`, `LIGNES_AUTRES_FAITS_FICTIFS`), `EN_TETES`, `REGLAGES_FICTIFS`, `VERSION_CONTENU` (1) et `GENERE_LE`. Un lot qui ajoute un cas **ajoute des lignes** ici, avec de nouveaux identifiants.
+- **À savoir pour les lots suivants**
+  - `COLONNES_RESERVEES` est écrite deux fois : client (ce lot) et serveur (lot 306) ; si l'une change, l'autre suit.
+  - Le paquet internes fictif ne donne aucune question écartée ; le paquet admin en donne une (`Q-000017` dans `NIV-0008`, motif `valeur_sans_correspondance`) (lots 201, 213).
+  - Toute modification du jeu fictif ajoute des lignes plutôt qu'elle n'en change, et augmente `versionContenu` et `contenu.version` : changer `VERSION_CONTENU` dans `lignes-fictives.js` suffit pour les deux (lots 107, 204 à 206).
+  - Pour simuler un monde devenu invisible, retire sa ligne de `mondes` dans une copie locale du paquet internes (lot 208, critère 5.7) : le paquet internes est déjà filtré, `Visible` n'y change rien.
+  - Clés `Milieu` du jeu : `sang`, `bcp`, `chocolat`, `neutre`, celles du design system § 3.8 (lots 105, 202).
+  - Le mot `Statut` n'est lu nulle part dans `client/donnees-fictives/` : l'assemblage n'applique que les listes de `ATTENDU_FICTIF`.
+- **Tests** : `tests/client/contenu/forme-du-paquet.test.js` (1 à 6, avec une cinquantaine de sous-cas) et `tests/client/donnees-fictives/paquets-fictifs.test.js` (7 à 20). Le test 14 recalcule les questions servies et leurs motifs à part, sans `ATTENDU_FICTIF`.
+
 ## Décisions
 
 - 17 novembre 2026 : `.claude/settings.local.json` créé avec des refus d'`Edit` sur les dossiers locaux de Carnet Réa et d'EchoLearn trouvés sur l'ordinateur (l'auteur pensait ne rien avoir en local ; des copies existent, il n'a pas désigné lesquelles, la règle large a été prise par prudence).
 - 17 novembre 2026 : le crochet est écrit avec une fonction `est_interdit` et non un `case` dans `$(…)`, que le `sh` de macOS ne lit pas.
 - 17 novembre 2026 : `documents-depot/` (copie locale de `claude/depot/`, relue et acceptée par l'auteur) est la seule source des documents ; elle est hors du dépôt.
+
+- 23 novembre 2026 (lot 102) : la spec ne fixe pas la forme de `ATTENDU_FICTIF` : forme retenue ci-dessus (listes d'`ID`, `faits` en `ID` → colonnes, `null` pour « toutes »). Autres précisions prises, dans l'esprit de la spec : une ligne sans `ID` lisible est désignée par sa position (`ligne-N`) ; une entrée de `etatDesQuestions` doit avoir exactement les deux clés `servie` et `motifs` ; un `ID` absent ou non texte ne donne que le défaut `id` (pas aussi `valeur_non_texte`) ; avec un type inconnu, `etatDesQuestions` n'est ni attendu ni inattendu ; l'ordre des clés de `compositionPrevue` suit l'ordre des niveaux.
+- 23 novembre 2026 (lot 102) : le fichier `lignes-fictives.js` contient le mot `Statut` en plus des en-têtes et des lignes : dans la petite fonction qui remplit les colonnes de validation d'une ligne (données, pas assemblage). `paquets-fictifs.js` ne le contient pas.
+- Rien n'est poussé : le commit du lot 102 est sur `dev`, local ; le push attend l'accord de l'auteur.
 
 ## Points à vérifier
 
@@ -82,5 +104,5 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 ## Reste
 
-- Lot 102, puis 103 (première publication sur GitHub Pages), 104, 105 et 106 (specs à écrire), 107, 108.
+- Lots 103 (première publication sur GitHub Pages), 104, 105 et 106 (specs à écrire), 107, 108.
 - Activer GitHub Pages et avancer `main` : seulement avec l'accord de l'auteur, à partir du lot 103.
