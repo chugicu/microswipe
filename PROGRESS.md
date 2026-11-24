@@ -112,6 +112,8 @@ Un dossier vide n'est pas créé (git ne le garde pas). La place de la page d'en
 
 ## Décisions
 
+- 23 novembre 2026 (lot 103, après essai sur téléphone) : la coquille se zoomait et se déplaçait dans tous les sens ; sur le choix de l'auteur, zoom par pincement, déplacement horizontal et rebond de la page sont bloqués (`maximum-scale=1, user-scalable=no`, `touch-action: pan-y`, `overscroll-behavior: none`, `gesturestart` annulé pour l'iPhone). Le défilement vertical reste. Contrepartie : plus d'agrandissement du texte par pincement. `VERSION_CLIENT` et `VERSION_DE_LA_COQUILLE` passent à 2. Publié le 23 novembre ; installé sur le téléphone de l'auteur : icône correcte.
+
 - 17 novembre 2026 : `.claude/settings.local.json` créé avec des refus d'`Edit` sur les dossiers locaux de Carnet Réa et d'EchoLearn trouvés sur l'ordinateur (l'auteur pensait ne rien avoir en local ; des copies existent, il n'a pas désigné lesquelles, la règle large a été prise par prudence).
 - 17 novembre 2026 : le crochet est écrit avec une fonction `est_interdit` et non un `case` dans `$(…)`, que le `sh` de macOS ne lit pas.
 - 17 novembre 2026 : `documents-depot/` (copie locale de `claude/depot/`, relue et acceptée par l'auteur) est la seule source des documents ; elle est hors du dépôt.
